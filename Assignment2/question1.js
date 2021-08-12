@@ -11,7 +11,6 @@ function get_json(obj) {
             "movies": obj[key]
         })
     }
-    console.log(temp)
     return temp
 }
 
