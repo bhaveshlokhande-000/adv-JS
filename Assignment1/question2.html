@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script>
+        //   const { profileEnd } = require('console');
+        //    const { url } = require('inspector');
+        //    const fetch = require('node-fetch')
+
+        function get_url(url) {
+            var patt = /{.*}/g;
+            url = url.replace(patt, "");
+            return url;
+        }
+
+        function get_data(url) {
+            return fetch(url).then(res => res.json()).then(data => data)
+        }
+
+        async function process(value) {
+            let res = []
+            let data = await fetch("https://api.github.com/search/repositories?q=" + value).then(res => res.json()).then(json => json.items)
+            for (let element of data) {
+                let temp = {};
+                temp.name = element.name;
+                temp.full_name = element.full_name;
+                temp.private = element.private;
+                let owner = {};
+                owner.login = element.owner.login
+                temp.owner = owner
+                temp.licenseName = element?.license?.name
+                temp.score = element.score
+                //owner.name = get_data(element.owner.url)
+                // owner.followersCount = get_data(element.owner.followers_url)
+                //owner.following_url = get_data(element.owner.following_url)
+                //temp.numberOfBranch = get_data(element.branches_url)
+                let td = await Promise.all([get_data(element.owner.url).then(data => data.name), get_data(element.owner.followers_url).then(data => data.length), get_data(element.owner.following_url).then(data => data.length), get_data(element.branches_url).then(data => data.length)])
+                owner.name = td[0]
+                owner.followersCount = td[1]
+                owner.followingCount = td[2]
+                temp.numberOfBranches = td[3]
+                res.push(temp)
+            }
+            console.log(res)
+            document.getElementById("content").innerHTML = JSON.stringify(res)
+        }
+    </script>
+</head>
+
+<body>
+    <input type="text" onchange="process(this.value)">
+    <div id="content"></div>
+</body>
+
+</html>
