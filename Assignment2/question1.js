@@ -3,11 +3,17 @@ const { title } = require('process')
 
 process()
 
-function get_json(obj) {
+function get_json(obj,t) {
     let temp = []
     for (let key in obj) {
+        if(t==0)
         temp.push({
             "name": key,
+            "movies": obj[key]
+        })
+        else
+            temp.push({
+            "types": key,
             "movies": obj[key]
         })
     }
@@ -42,8 +48,8 @@ async function process() {
     })
 
     let res = {
-        actors: get_json(actors),
-        Genres: get_json(genres)
+        actors: get_json(actors,0),
+        Genres: get_json(genres,1)
     }
     console.log(res)
 }
